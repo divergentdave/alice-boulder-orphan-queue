@@ -1,0 +1,5 @@
+/harness/workload/workload
+/harness/verifier/verifier
+/workload_dir
+/traces_dir
+temp.gdb
