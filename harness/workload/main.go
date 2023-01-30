@@ -70,7 +70,7 @@ func newOrphanedCert() orphanedCert {
 }
 
 func main() {
-	for i := 1; i < restartCycleCount; i++ {
+	for i := 0; i < restartCycleCount; i++ {
 		runOnce()
 	}
 }
