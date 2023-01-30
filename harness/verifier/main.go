@@ -7,11 +7,12 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/beeker1121/goque"
 )
 
-var pattern = regexp.MustCompile(`^(?:Writing orphan with ID (\d+)|Wrote orphan with ID (\d+)|Integrated orphan with ID (\d+)|Error .*)$`)
+var pattern = regexp.MustCompile(`^(?:Writing orphan with ID (\d+)|Wrote orphan with ID (\d+)|Integrated orphan with ID (\d+)|Error .*|Opened queue|Closing queue|Restarting)$`)
 
 type orphanState struct {
 	// Whether we've seen a message indicating an attempt was made to write
@@ -87,7 +88,7 @@ func main() {
 			}
 			state.wasRead = true
 			states[regID] = state
-		} else {
+		} else if strings.HasPrefix(line, "Error") {
 			log.Fatalln(line)
 		}
 	}

@@ -71,6 +71,9 @@ func newOrphanedCert() orphanedCert {
 
 func main() {
 	for i := 0; i < restartCycleCount; i++ {
+		if i != 0 {
+			writeTranscript("Restarting\n")
+		}
 		runOnce()
 	}
 }
@@ -79,10 +82,12 @@ func runOnce() {
 	var orphanQueue *goque.Queue
 	var err error
 	orphanQueue, err = goque.OpenQueue(filename)
+	writeTranscript("Opened queue\n")
 	if err != nil {
 		log.Fatalf("Opening queue failed: %s\n", err)
 	}
 	defer func() {
+		writeTranscript("Closing queue\n")
 		err := orphanQueue.Close()
 		if err != nil {
 			// Write to stderr for diagnostics.
