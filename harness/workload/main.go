@@ -2,6 +2,7 @@ package main
 
 import (
 	cryptorand "crypto/rand"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -12,10 +13,35 @@ import (
 )
 
 const filename = "workload_dir/orphanqueue"
-const restartCycleCount = 5
-const readLoopIterationCount = 20
-const writeGoroutinesCount = 5
-const integrateFailureChance = 0.25
+
+type Config struct {
+	// Number of times to open and close the queue.
+	restartCycleCount int
+	// Number of times per restart to read from the queue.
+	readLoopIterationCount int
+	// Number of times to write to the queue, in parallel.
+	writeGoroutinesCount int
+	// Probability of not dequeueing an item after peeking it.
+	integrateFailureChance float64
+}
+
+func parseConfig() Config {
+	var restartCycleCount int
+	var readLoopIterationCount int
+	var writeGoroutinesCount int
+	var integrateFailureChance float64
+	flag.IntVar(&restartCycleCount, "restarts", 5, "number of times to open and close the queue")
+	flag.IntVar(&readLoopIterationCount, "reads", 20, "number of times per restart to read from the queue")
+	flag.IntVar(&writeGoroutinesCount, "writes", 5, "number of times to write to the queue, in parallel")
+	flag.Float64Var(&integrateFailureChance, "probability", 0.25, "probability of not dequeueing an item after peeking it")
+	flag.Parse()
+	return Config{
+		restartCycleCount,
+		readLoopIterationCount,
+		writeGoroutinesCount,
+		integrateFailureChance,
+	}
+}
 
 // writeTranscript formats and prints a message to stdout. It exits the program
 // with an error if the underlying I/O option failed, including if it returned a
@@ -70,15 +96,16 @@ func newOrphanedCert() orphanedCert {
 }
 
 func main() {
-	for i := 0; i < restartCycleCount; i++ {
+	config := parseConfig()
+	for i := 0; i < config.restartCycleCount; i++ {
 		if i != 0 {
 			writeTranscript("Restarting\n")
 		}
-		runOnce()
+		runOnce(config)
 	}
 }
 
-func runOnce() {
+func runOnce(config Config) {
 	var orphanQueue *goque.Queue
 	var err error
 	orphanQueue, err = goque.OpenQueue(filename)
@@ -98,17 +125,17 @@ func runOnce() {
 	}()
 
 	var wg sync.WaitGroup
-	wg.Add(writeGoroutinesCount + 1)
+	wg.Add(config.writeGoroutinesCount + 1)
 
-	go readQueueLoop(orphanQueue, &wg)
-	for i := 0; i < writeGoroutinesCount; i++ {
+	go readQueueLoop(orphanQueue, &wg, config)
+	for i := 0; i < config.writeGoroutinesCount; i++ {
 		go writeQueue(orphanQueue, &wg)
 	}
 
 	wg.Wait()
 }
 
-func integrateOrphan(orphanQueue *goque.Queue) error {
+func integrateOrphan(orphanQueue *goque.Queue, integrateFailureChance float64) error {
 	item, err := orphanQueue.Peek()
 	if err != nil {
 		if err == goque.ErrEmpty {
@@ -131,9 +158,9 @@ func integrateOrphan(orphanQueue *goque.Queue) error {
 	return nil
 }
 
-func readQueueLoop(orphanQueue *goque.Queue, wg *sync.WaitGroup) {
-	for i := 0; i < readLoopIterationCount; i++ {
-		err := integrateOrphan(orphanQueue)
+func readQueueLoop(orphanQueue *goque.Queue, wg *sync.WaitGroup, config Config) {
+	for i := 0; i < config.readLoopIterationCount; i++ {
+		err := integrateOrphan(orphanQueue, config.integrateFailureChance)
 		if err != nil {
 			if err == goque.ErrEmpty {
 				time.Sleep(time.Millisecond)

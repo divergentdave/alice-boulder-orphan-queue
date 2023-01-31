@@ -23,5 +23,6 @@ mkdir traces_dir
 # Run the workload and collect traces.
 alice-record --workload_dir workload_dir \
     --traces_dir traces_dir \
-    ./harness/workload/workload
+    ./harness/workload/workload \
+    "$@"
 # TODO: try piping stdout to /dev/null, to avoid blocking or partial writes.
