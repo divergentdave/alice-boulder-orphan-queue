@@ -3,3 +3,4 @@
 /workload_dir
 /traces_dir
 temp.gdb
+/checker_logs
