@@ -9,4 +9,6 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 )
 
-replace github.com/syndtr/goleveldb v1.0.0 => github.com/divergentdave/goleveldb v0.0.0-20230131031248-8779f3c52dad
+replace github.com/syndtr/goleveldb v1.0.0 => github.com/divergentdave/goleveldb v0.0.0-20230205000127-b20a4d0aed4e
+
+replace github.com/beeker1121/goque v1.0.3-0.20191103205551-d618510128af => github.com/divergentdave/goque v0.0.0-20230205000050-328a7006e24a

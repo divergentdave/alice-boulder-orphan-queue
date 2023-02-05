@@ -1,7 +1,7 @@
-github.com/beeker1121/goque v1.0.3-0.20191103205551-d618510128af h1:XbgLdZvVbWsK9HAhAYOp6rksTAdOVYDBQtGSVOLlJrw=
-github.com/beeker1121/goque v1.0.3-0.20191103205551-d618510128af/go.mod h1:84CWnaDz4g1tEVnFLnuBigmGK15oPohy0RfvSN8d4eg=
-github.com/divergentdave/goleveldb v0.0.0-20230131031248-8779f3c52dad h1:c4ygvXjVtiThu1G57hlyuZxHmUMN8YbQT6yMeraikx0=
-github.com/divergentdave/goleveldb v0.0.0-20230131031248-8779f3c52dad/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
+github.com/divergentdave/goleveldb v0.0.0-20230205000127-b20a4d0aed4e h1:GpAqXyCSPHhpMXuXH6l+jiv/B9NLI9ziEOmWFDa+RLw=
+github.com/divergentdave/goleveldb v0.0.0-20230205000127-b20a4d0aed4e/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
+github.com/divergentdave/goque v0.0.0-20230205000050-328a7006e24a h1:GR18Nbds8yryXxypYRK68NiPNJDD/li6KYBg5C7i5Hs=
+github.com/divergentdave/goque v0.0.0-20230205000050-328a7006e24a/go.mod h1:84CWnaDz4g1tEVnFLnuBigmGK15oPohy0RfvSN8d4eg=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db h1:woRePGFeVFfLKN/pOkfl+p/TAqKOfFu+7KPlMVpok/w=
