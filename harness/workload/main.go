@@ -6,13 +6,16 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/beeker1121/goque"
 )
 
 const filename = "workload_dir/orphanqueue"
+const parentDirectory = "workload_dir"
 
 type Config struct {
 	// Number of times to open and close the queue.
@@ -96,6 +99,17 @@ func newOrphanedCert() orphanedCert {
 }
 
 func main() {
+	// Hack: create the orphanqueue directory and fsync its parent to get past
+	// some low-salience startup-time durability issues.
+	err := os.MkdirAll(filename, 0755)
+	if err != nil {
+		log.Fatalf("Creating directories failed: %s\n", err)
+	}
+	err = syncDir(parentDirectory)
+	if err != nil {
+		log.Fatalf("Syncing directory failed: %s\n", err)
+	}
+
 	config := parseConfig()
 	for i := 0; i < config.restartCycleCount; i++ {
 		if i != 0 {
@@ -189,4 +203,29 @@ func writeQueue(orphanQueue *goque.Queue, wg *sync.WaitGroup) {
 	writeTranscript("Wrote orphan with ID %v\n", orphan.RegID)
 
 	wg.Done()
+}
+
+// syncDir calls fsync(2) ona directory, which is necessary on Linux, and
+// ignores EINVAL errors that may arise on other systems.
+func syncDir(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+	if err := f.Sync(); err != nil {
+		if err == os.ErrInvalid {
+			return nil
+		}
+		// Go < 1.8
+		if syserr, ok := err.(*os.SyscallError); ok && syserr.Err == syscall.EINVAL {
+			return nil
+		}
+		// Go >= 1.8
+		if patherr, ok := err.(*os.PathError); ok && patherr.Err == syscall.EINVAL {
+			return nil
+		}
+		return err
+	}
+	return nil
 }
